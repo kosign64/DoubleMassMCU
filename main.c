@@ -12,6 +12,7 @@ typedef unsigned char uchar;
 #define POT    7
 #define HALL   6
 #define DIR    2
+#define PWM    1
 
 int potentiometr = 0;
 int control = 0;
@@ -23,7 +24,7 @@ void sendByteUART(uchar byte);
 
 int main(void)
 {
-    DDRB = _BV(0) | _BV(1) | _BV(2);
+    DDRB = _BV(0) | _BV(PWM) | _BV(DIR);
     DDRD = _BV(LED);
 
     // Timer 1 Fast PWM 8-bit, 11.0592 MHz
@@ -59,7 +60,7 @@ int main(void)
     {
         // Blink led
         PORTD ^= _BV(LED);
-        if(bit_is_clear(PIND, 4))
+        if(bit_is_clear(PIND, TOGGLE))
         {
             unsigned int pot = readAdc(POT);
             pot = (pot + 1) / 2;
@@ -141,7 +142,7 @@ unsigned int readAdc(unsigned char channel)
 
 unsigned int readEncoder(void)
 {
-    char tmp,tmp2;
+    uchar tmp, tmp2;
     unsigned int result;
 
     PORTB &= ~_BV(0);
